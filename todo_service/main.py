@@ -1,8 +1,12 @@
 from flask import Flask
 from flask import jsonify
 from flask import request
+from connect import pgConnect
+from dbOperations import dbOperations
 import json
-from flask_cors import CORS #include this line
+from flask_cors import CORS
+
+dbConnection = pgConnect().dbConnect()
 
 #read file
 with open('tasks.json','r') as myfile:
@@ -14,26 +18,27 @@ app = Flask(__name__)
 app.run(debug=True)
 CORS(app)
 
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
 
 @app.route('/todo/get',methods=['GET'])
 def getTasks():
-    return jsonify(tasksData)
+    sql = "SELECT * FROM tasks.task"
+    tasks = dbOperations.select(dbConnection,sql)
+    return jsonify(tasks)
 
 @app.route('/todo/create',methods=['POST'])
 def createTask():
     req_data = request.get_json()
-    higherId = 0 
-    for idx, task in enumerate(tasksData):
-        higherId = task["id"]
-        if(task["id"] > higherId):
-            higherId = task["id"]
     
-    req_data["id"] = higherId + 1
-    tasksData.append(req_data)
-    return f"Task {req_data["id"]} has been created"
+    sql = """
+    INSERT into tasks.task (description,status) 
+    values('%s','%s') RETURNING id;
+    """ % (req_data["description"], req_data["status"])
+    created = dbOperations.insert(dbConnection,sql)
+    return f"Task {created} has been created"
 
 @app.route('/todo/update/<id>',methods=['PUT'])
 def updateTask(id):
