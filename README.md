@@ -4,6 +4,7 @@ Phytonesco é uma rest api em python, apenas para estudos
 
 
 ## INSTALL
+
 ```bash
 pip install psycopg2 
 pip install flask flask-jsonpify flask-sqlalchemy flask-restful
@@ -13,9 +14,10 @@ Install postgres
 
 SQLS PRE PROJECT
 
-```bash
-CREATE SCHEMA tasks AUTHORIZATION postgres;
 
+# Create schema
+CREATE SCHEMA tasks AUTHORIZATION postgres;
+# Create Table
 CREATE TABLE tasks.task (
 	id serial4 NOT NULL,
 	description varchar NULL,
@@ -24,7 +26,6 @@ CREATE TABLE tasks.task (
 );
 
 ## TO RUN
-```bash
 flask --app main.py --debug run
 
 
